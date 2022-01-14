@@ -2,34 +2,46 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Brunna Siqueira &#8211; Descomplica Upgrade</title>
+<title>Brunna Siqueira &#8211; Mapa do Dinheiro Urgente </title>
 <meta name='robots' content='max-image-preview:large' />
 <link rel='dns-prefetch' href='//s.w.org' />
 <link rel="alternate" type="application/rss+xml" title="Feed para Brunna Siqueira &raquo;" href="https://brunnasiqueira.com/feed/" />
 <link rel="alternate" type="application/rss+xml" title="Feed de comentários para Brunna Siqueira &raquo;" href="https://brunnasiqueira.com/comments/feed/" />
 
-<script src="//www.googletagmanager.com/gtag/js?id=UA-178048795-1" type="text/javascript" data-cfasync="false"></script>
-<script type="text/javascript" data-cfasync="false">
-				var mi_version = '7.17.0';
+<script src="//www.googletagmanager.com/gtag/js?id=UA-178048795-1" type="text/javascript" data-cfasync="false" data-wpfc-render="false" async></script>
+<script type="text/javascript" data-cfasync="false" data-wpfc-render="false">
+				var mi_version = '8.3.0';
 				var mi_track_user = true;
 				var mi_no_track_reason = '';
 				
-								var disableStr = 'ga-disable-UA-178048795-1';
+								var disableStrs = [
+															'ga-disable-UA-178048795-1',
+									];
 
 				/* Function to detect opted out users */
 				function __gtagTrackerIsOptedOut() {
-					return document.cookie.indexOf( disableStr + '=true' ) > - 1;
+					for ( var index = 0; index < disableStrs.length; index++ ) {
+						if ( document.cookie.indexOf( disableStrs[ index ] + '=true' ) > -1 ) {
+							return true;
+						}
+					}
+
+					return false;
 				}
 
 				/* Disable tracking if the opt-out cookie exists. */
 				if ( __gtagTrackerIsOptedOut() ) {
-					window[disableStr] = true;
+					for ( var index = 0; index < disableStrs.length; index++ ) {
+						window[ disableStrs[ index ] ] = true;
+					}
 				}
 
 				/* Opt-out function */
 				function __gtagTrackerOptout() {
-					document.cookie = disableStr + '=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';
-					window[disableStr] = true;
+					for ( var index = 0; index < disableStrs.length; index++ ) {
+						document.cookie = disableStrs[ index ] + '=true; expires=Thu, 31 Dec 2099 23:59:59 UTC; path=/';
+						window[ disableStrs[ index ] ] = true;
+					}
 				}
 
 				if ( 'undefined' === typeof gaOptout ) {
@@ -38,16 +50,40 @@
 					}
 				}
 								window.dataLayer = window.dataLayer || [];
+
+				window.MonsterInsightsDualTracker = {
+					helpers: {},
+					trackers: {},
+				};
 				if ( mi_track_user ) {
-					function __gtagTracker() {dataLayer.push( arguments );}
+					function __gtagDataLayer() {
+						dataLayer.push( arguments );
+					}
+
+					function __gtagTracker( type, name, parameters ) {
+						if (!parameters) {
+							parameters = {};
+						}
+
+						if (parameters.send_to) {
+							__gtagDataLayer.apply( null, arguments );
+							return;
+						}
+
+						if ( type === 'event' ) {
+							
+															parameters.send_to = monsterinsights_frontend.ua;
+								__gtagDataLayer( type, name, parameters );
+													} else {
+							__gtagDataLayer.apply( null, arguments );
+						}
+					}
 					__gtagTracker( 'js', new Date() );
 					__gtagTracker( 'set', {
 						'developer_id.dZGIzZG' : true,
-						                    });
-					__gtagTracker( 'config', 'UA-178048795-1', {
-						forceSSL:true,link_attribution:true,					} );
-										window.gtag = __gtagTracker;										(
-						function () {
+											} );
+															__gtagTracker( 'config', 'UA-178048795-1', {"forceSSL":"true","link_attribution":"true"} );
+										window.gtag = __gtagTracker;											(function () {
 							/* https://developers.google.com/analytics/devguides/collection/analyticsjs/ */
 							/* ga and __gaTracker compatibility shim. */
 							var noopfn = function () {
@@ -86,16 +122,25 @@
 												}
 											}
 										}
+										if ( 'pageview' === arguments[1] ) {
+											if ( 'undefined' !== typeof arguments[2] ) {
+												hitObject = {
+													'eventAction': 'page_view',
+													'page_path' : arguments[2],
+												}
+											}
+										}
 										if ( typeof arguments[2] === 'object' ) {
 											hitObject = arguments[2];
 										}
 										if ( typeof arguments[5] === 'object' ) {
 											Object.assign( hitObject, arguments[5] );
 										}
-										if ( 'undefined' !== typeof (
-											arguments[1].hitType
-										) ) {
+										if ( 'undefined' !== typeof arguments[1].hitType ) {
 											hitObject = arguments[1];
+											if ( 'pageview' === hitObject.hitType ) {
+												hitObject.eventAction = 'page_view';
+											}
 										}
 										if ( hitObject ) {
 											action = 'timing' === arguments[1].hitType ? 'timing_complete' : hitObject.eventAction;
@@ -107,7 +152,7 @@
 								}
 
 								function mapArgs( args ) {
-									var gaKey, hit = {};
+									var arg, hit = {};
 									var gaMap = {
 										'eventCategory': 'event_category',
 										'eventAction': 'event_action',
@@ -118,10 +163,15 @@
 										'timingVar': 'name',
 										'timingValue': 'value',
 										'timingLabel': 'event_label',
+										'page' : 'page_path',
+										'location' : 'page_location',
+										'title' : 'page_title',
 									};
-									for ( gaKey in gaMap ) {
-										if ( 'undefined' !== typeof args[gaKey] ) {
-											hit[gaMap[gaKey]] = args[gaKey];
+									for ( arg in args ) {
+																				if ( ! ( ! args.hasOwnProperty(arg) || ! gaMap.hasOwnProperty(arg) ) ) {
+											hit[gaMap[arg]] = args[arg];
+										} else {
+											hit[arg] = args[arg];
 										}
 									}
 									return hit;
@@ -140,8 +190,7 @@
 							__gaTracker.remove = noopfn;
 							__gaTracker.loaded = true;
 							window['__gaTracker'] = __gaTracker;
-						}
-					)();
+						})();
 									} else {
 										console.log( "" );
 					( function () {
@@ -155,8 +204,8 @@
 			</script>
 
 <script type="text/javascript">
-			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/13.0.1\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/13.0.1\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/brunnasiqueira.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=5.7.2"}};
-			!function(e,a,t){var n,r,o,i=a.createElement("canvas"),p=i.getContext&&i.getContext("2d");function s(e,t){var a=String.fromCharCode;p.clearRect(0,0,i.width,i.height),p.fillText(a.apply(this,e),0,0);e=i.toDataURL();return p.clearRect(0,0,i.width,i.height),p.fillText(a.apply(this,t),0,0),e===i.toDataURL()}function c(e){var t=a.createElement("script");t.src=e,t.defer=t.type="text/javascript",a.getElementsByTagName("head")[0].appendChild(t)}for(o=Array("flag","emoji"),t.supports={everything:!0,everythingExceptFlag:!0},r=0;r<o.length;r++)t.supports[o[r]]=function(e){if(!p||!p.fillText)return!1;switch(p.textBaseline="top",p.font="600 32px Arial",e){case"flag":return s([127987,65039,8205,9895,65039],[127987,65039,8203,9895,65039])?!1:!s([55356,56826,55356,56819],[55356,56826,8203,55356,56819])&&!s([55356,57332,56128,56423,56128,56418,56128,56421,56128,56430,56128,56423,56128,56447],[55356,57332,8203,56128,56423,8203,56128,56418,8203,56128,56421,8203,56128,56430,8203,56128,56423,8203,56128,56447]);case"emoji":return!s([55357,56424,8205,55356,57212],[55357,56424,8203,55356,57212])}return!1}(o[r]),t.supports.everything=t.supports.everything&&t.supports[o[r]],"flag"!==o[r]&&(t.supports.everythingExceptFlag=t.supports.everythingExceptFlag&&t.supports[o[r]]);t.supports.everythingExceptFlag=t.supports.everythingExceptFlag&&!t.supports.flag,t.DOMReady=!1,t.readyCallback=function(){t.DOMReady=!0},t.supports.everything||(n=function(){t.readyCallback()},a.addEventListener?(a.addEventListener("DOMContentLoaded",n,!1),e.addEventListener("load",n,!1)):(e.attachEvent("onload",n),a.attachEvent("onreadystatechange",function(){"complete"===a.readyState&&t.readyCallback()})),(n=t.source||{}).concatemoji?c(n.concatemoji):n.wpemoji&&n.twemoji&&(c(n.twemoji),c(n.wpemoji)))}(window,document,window._wpemojiSettings);
+			window._wpemojiSettings = {"baseUrl":"https:\/\/s.w.org\/images\/core\/emoji\/13.1.0\/72x72\/","ext":".png","svgUrl":"https:\/\/s.w.org\/images\/core\/emoji\/13.1.0\/svg\/","svgExt":".svg","source":{"concatemoji":"https:\/\/brunnasiqueira.com\/wp-includes\/js\/wp-emoji-release.min.js?ver=5.8.3"}};
+			!function(e,a,t){var n,r,o,i=a.createElement("canvas"),p=i.getContext&&i.getContext("2d");function s(e,t){var a=String.fromCharCode;p.clearRect(0,0,i.width,i.height),p.fillText(a.apply(this,e),0,0);e=i.toDataURL();return p.clearRect(0,0,i.width,i.height),p.fillText(a.apply(this,t),0,0),e===i.toDataURL()}function c(e){var t=a.createElement("script");t.src=e,t.defer=t.type="text/javascript",a.getElementsByTagName("head")[0].appendChild(t)}for(o=Array("flag","emoji"),t.supports={everything:!0,everythingExceptFlag:!0},r=0;r<o.length;r++)t.supports[o[r]]=function(e){if(!p||!p.fillText)return!1;switch(p.textBaseline="top",p.font="600 32px Arial",e){case"flag":return s([127987,65039,8205,9895,65039],[127987,65039,8203,9895,65039])?!1:!s([55356,56826,55356,56819],[55356,56826,8203,55356,56819])&&!s([55356,57332,56128,56423,56128,56418,56128,56421,56128,56430,56128,56423,56128,56447],[55356,57332,8203,56128,56423,8203,56128,56418,8203,56128,56421,8203,56128,56430,8203,56128,56423,8203,56128,56447]);case"emoji":return!s([10084,65039,8205,55357,56613],[10084,65039,8203,55357,56613])}return!1}(o[r]),t.supports.everything=t.supports.everything&&t.supports[o[r]],"flag"!==o[r]&&(t.supports.everythingExceptFlag=t.supports.everythingExceptFlag&&t.supports[o[r]]);t.supports.everythingExceptFlag=t.supports.everythingExceptFlag&&!t.supports.flag,t.DOMReady=!1,t.readyCallback=function(){t.DOMReady=!0},t.supports.everything||(n=function(){t.readyCallback()},a.addEventListener?(a.addEventListener("DOMContentLoaded",n,!1),e.addEventListener("load",n,!1)):(e.attachEvent("onload",n),a.attachEvent("onreadystatechange",function(){"complete"===a.readyState&&t.readyCallback()})),(n=t.source||{}).concatemoji?c(n.concatemoji):n.wpemoji&&n.twemoji&&(c(n.twemoji),c(n.wpemoji)))}(window,document,window._wpemojiSettings);
 		</script>
 <style type="text/css">
 img.wp-smiley,
@@ -172,7 +221,7 @@ img.emoji {
 	padding: 0 !important;
 }
 </style>
-<link rel='stylesheet' id='wp-block-library-css' href='https://brunnasiqueira.com/wp-includes/css/dist/block-library/style.min.css?ver=5.7.2' type='text/css' media='all' />
+<link rel='stylesheet' id='wp-block-library-css' href='https://brunnasiqueira.com/wp-includes/css/dist/block-library/style.min.css?ver=5.8.3' type='text/css' media='all' />
 <link rel='stylesheet' id='wxacs_front_style-css' href='https://brunnasiqueira.com/wp-content/plugins/scrollbar-by-webxapp/assets/css/style.css?ver=1.2.1' type='text/css' media='all' />
 <style id='wxacs_front_style-inline-css' type='text/css'>
 ::-webkit-scrollbar {
@@ -189,35 +238,45 @@ img.emoji {
                                 background: rgb(255, 255, 255); 
                            }
 </style>
-<link rel='stylesheet' id='hello-elementor-css' href='https://brunnasiqueira.com/wp-content/themes/hello-elementor/style.min.css?ver=2.3.1' type='text/css' media='all' />
-<link rel='stylesheet' id='hello-elementor-theme-style-css' href='https://brunnasiqueira.com/wp-content/themes/hello-elementor/theme.min.css?ver=2.3.1' type='text/css' media='all' />
-<link rel='stylesheet' id='elementor-icons-css' href='https://brunnasiqueira.com/wp-content/plugins/elementor/assets/lib/eicons/css/elementor-icons.min.css?ver=5.12.0' type='text/css' media='all' />
-<link rel='stylesheet' id='elementor-frontend-legacy-css' href='https://brunnasiqueira.com/wp-content/plugins/elementor/assets/css/frontend-legacy.min.css?ver=3.3.1' type='text/css' media='all' />
-<link rel='stylesheet' id='elementor-frontend-css' href='https://brunnasiqueira.com/wp-content/plugins/elementor/assets/css/frontend.min.css?ver=3.3.1' type='text/css' media='all' />
-<style id='elementor-frontend-inline-css' type='text/css'>
-@font-face{font-family:eicons;src:url(https://brunnasiqueira.com/wp-content/plugins/elementor/assets/lib/eicons/fonts/eicons.eot?5.10.0);src:url(https://brunnasiqueira.com/wp-content/plugins/elementor/assets/lib/eicons/fonts/eicons.eot?5.10.0#iefix) format("embedded-opentype"),url(https://brunnasiqueira.com/wp-content/plugins/elementor/assets/lib/eicons/fonts/eicons.woff2?5.10.0) format("woff2"),url(https://brunnasiqueira.com/wp-content/plugins/elementor/assets/lib/eicons/fonts/eicons.woff?5.10.0) format("woff"),url(https://brunnasiqueira.com/wp-content/plugins/elementor/assets/lib/eicons/fonts/eicons.ttf?5.10.0) format("truetype"),url(https://brunnasiqueira.com/wp-content/plugins/elementor/assets/lib/eicons/fonts/eicons.svg?5.10.0#eicon) format("svg");font-weight:400;font-style:normal}
-</style>
-<link rel='stylesheet' id='elementor-post-5-css' href='https://brunnasiqueira.com/wp-content/uploads/elementor/css/post-5.css?ver=1626827119' type='text/css' media='all' />
+<link rel='stylesheet' id='hello-elementor-css' href='https://brunnasiqueira.com/wp-content/themes/hello-elementor/style.min.css?ver=2.4.1' type='text/css' media='all' />
+<link rel='stylesheet' id='hello-elementor-theme-style-css' href='https://brunnasiqueira.com/wp-content/themes/hello-elementor/theme.min.css?ver=2.4.1' type='text/css' media='all' />
+<link rel='stylesheet' id='elementor-icons-ekiticons-css' href='https://brunnasiqueira.com/wp-content/plugins/elementskit-lite/modules/elementskit-icon-pack/assets/css/ekiticons.css?ver=2.5.1' type='text/css' media='all' />
+<link rel='stylesheet' id='elementor-icons-css' href='https://brunnasiqueira.com/wp-content/plugins/elementor/assets/lib/eicons/css/elementor-icons.min.css?ver=5.13.0' type='text/css' media='all' />
+<link rel='stylesheet' id='elementor-frontend-legacy-css' href='https://brunnasiqueira.com/wp-content/plugins/elementor/assets/css/frontend-legacy.min.css?ver=3.5.3' type='text/css' media='all' />
+<link rel='stylesheet' id='elementor-frontend-css' href='https://brunnasiqueira.com/wp-content/plugins/elementor/assets/css/frontend.min.css?ver=3.5.3' type='text/css' media='all' />
+<link rel='stylesheet' id='elementor-post-5-css' href='https://brunnasiqueira.com/wp-content/uploads/elementor/css/post-5.css?ver=1640737518' type='text/css' media='all' />
 <link rel='stylesheet' id='elementor-pro-css' href='https://brunnasiqueira.com/wp-content/plugins/elementor-pro/assets/css/frontend.min.css?ver=3.0.10' type='text/css' media='all' />
-<link rel='stylesheet' id='elementor-global-css' href='https://brunnasiqueira.com/wp-content/uploads/elementor/css/global.css?ver=1626827120' type='text/css' media='all' />
-<link rel='stylesheet' id='elementor-post-6-css' href='https://brunnasiqueira.com/wp-content/uploads/elementor/css/post-6.css?ver=1628955657' type='text/css' media='all' />
-<link rel='stylesheet' id='google-fonts-1-css' href='https://fonts.googleapis.com/css?family=Roboto%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic%7CRoboto+Slab%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic%7CMontserrat%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic&#038;display=auto&#038;ver=5.7.2' type='text/css' media='all' />
+<link rel='stylesheet' id='elementor-global-css' href='https://brunnasiqueira.com/wp-content/uploads/elementor/css/global.css?ver=1640737518' type='text/css' media='all' />
+<link rel='stylesheet' id='elementor-post-6-css' href='https://brunnasiqueira.com/wp-content/uploads/elementor/css/post-6.css?ver=1640878713' type='text/css' media='all' />
+<link rel='stylesheet' id='ekit-widget-styles-css' href='https://brunnasiqueira.com/wp-content/plugins/elementskit-lite/widgets/init/assets/css/widget-styles.css?ver=2.5.1' type='text/css' media='all' />
+<link rel='stylesheet' id='ekit-responsive-css' href='https://brunnasiqueira.com/wp-content/plugins/elementskit-lite/widgets/init/assets/css/responsive.css?ver=2.5.1' type='text/css' media='all' />
+<link rel='stylesheet' id='google-fonts-1-css' href='https://fonts.googleapis.com/css?family=Roboto%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic%7CRoboto+Slab%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic%7CMontserrat%3A100%2C100italic%2C200%2C200italic%2C300%2C300italic%2C400%2C400italic%2C500%2C500italic%2C600%2C600italic%2C700%2C700italic%2C800%2C800italic%2C900%2C900italic&#038;display=auto&#038;ver=5.8.3' type='text/css' media='all' />
 <link rel='stylesheet' id='elementor-icons-shared-0-css' href='https://brunnasiqueira.com/wp-content/plugins/elementor/assets/lib/font-awesome/css/fontawesome.min.css?ver=5.15.3' type='text/css' media='all' />
 <link rel='stylesheet' id='elementor-icons-fa-solid-css' href='https://brunnasiqueira.com/wp-content/plugins/elementor/assets/lib/font-awesome/css/solid.min.css?ver=5.15.3' type='text/css' media='all' />
 <script type='text/javascript' id='monsterinsights-frontend-script-js-extra'>
 /* <![CDATA[ */
-var monsterinsights_frontend = {"js_events_tracking":"true","download_extensions":"doc,pdf,ppt,zip,xls,docx,pptx,xlsx","inbound_paths":"[{\"path\":\"\\\/go\\\/\",\"label\":\"affiliate\"},{\"path\":\"\\\/recommend\\\/\",\"label\":\"affiliate\"}]","home_url":"https:\/\/brunnasiqueira.com","hash_tracking":"false","ua":"UA-178048795-1"};
+var monsterinsights_frontend = {"js_events_tracking":"true","download_extensions":"doc,pdf,ppt,zip,xls,docx,pptx,xlsx","inbound_paths":"[{\"path\":\"\\\/go\\\/\",\"label\":\"affiliate\"},{\"path\":\"\\\/recommend\\\/\",\"label\":\"affiliate\"}]","home_url":"https:\/\/brunnasiqueira.com","hash_tracking":"false","ua":"UA-178048795-1","v4_id":""};
 /* ]]> */
 </script>
-<script type='text/javascript' src='https://brunnasiqueira.com/wp-content/plugins/google-analytics-for-wordpress/assets/js/frontend-gtag.min.js?ver=7.17.0' id='monsterinsights-frontend-script-js'></script>
+<script type='text/javascript' src='https://brunnasiqueira.com/wp-content/plugins/google-analytics-for-wordpress/assets/js/frontend-gtag.min.js?ver=8.3.0' id='monsterinsights-frontend-script-js'></script>
+<script type='text/javascript' src='https://brunnasiqueira.com/wp-includes/js/jquery/jquery.min.js?ver=3.6.0' id='jquery-core-js'></script>
+<script type='text/javascript' src='https://brunnasiqueira.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.3.2' id='jquery-migrate-js'></script>
 <link rel="https://api.w.org/" href="https://brunnasiqueira.com/wp-json/" /><link rel="alternate" type="application/json" href="https://brunnasiqueira.com/wp-json/wp/v2/pages/6" /><link rel="EditURI" type="application/rsd+xml" title="RSD" href="https://brunnasiqueira.com/xmlrpc.php?rsd" />
 <link rel="wlwmanifest" type="application/wlwmanifest+xml" href="https://brunnasiqueira.com/wp-includes/wlwmanifest.xml" />
-<meta name="generator" content="WordPress 5.7.2" />
+<meta name="generator" content="WordPress 5.8.3" />
 <link rel="canonical" href="https://brunnasiqueira.com/" />
 <link rel='shortlink' href='https://brunnasiqueira.com/' />
 <link rel="alternate" type="application/json+oembed" href="https://brunnasiqueira.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fbrunnasiqueira.com%2F" />
 <link rel="alternate" type="text/xml+oembed" href="https://brunnasiqueira.com/wp-json/oembed/1.0/embed?url=https%3A%2F%2Fbrunnasiqueira.com%2F&#038;format=xml" />
+<meta name="referrer" content="no-referrer-when-downgrade">
+<script id="hotmart_launcher_script">
+	(function(l,a,u,n,c,h,e,r){l['HotmartLauncherObject']=c;l[c]=l[c]||function(){
+	(l[c].q=l[c].q||[]).push(arguments)},l[c].l=1*new Date();h=a.createElement(u),
+	e=a.getElementsByTagName(u)[0];h.async=1;h.src=n;e.parentNode.insertBefore(h,e)
+	})(window,document,'script','//launcher.hotmart.com/launcher.js','hot');
 
+	hot('account','965258ba-b199-3769-952b-5bd7038ccd2c');
+</script>
 
 <script type='text/javascript'>
 !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
@@ -229,7 +288,7 @@ document,'script','https://connect.facebook.net/en_US/fbevents.js');
 
 <script type='text/javascript'>
   fbq('init', '363941031423415', {}, {
-    "agent": "wordpress-5.7.2-3.0.5"
+    "agent": "wordpress-5.8.3-3.0.6"
 });
 </script><script type='text/javascript'>
   fbq('track', 'PageView', []);
@@ -244,6 +303,22 @@ src="https://www.facebook.com/tr?id=363941031423415&ev=PageView&noscript=1" />
 <link rel="icon" href="https://brunnasiqueira.com/wp-content/uploads/2020/09/cropped-Sem-titulo-192x192.png" sizes="192x192" />
 <link rel="apple-touch-icon" href="https://brunnasiqueira.com/wp-content/uploads/2020/09/cropped-Sem-titulo-180x180.png" />
 <meta name="msapplication-TileImage" content="https://brunnasiqueira.com/wp-content/uploads/2020/09/cropped-Sem-titulo-270x270.png" />
+<style type="text/css" id="wp-custom-css">
+			#button{
+        animation: pulse .9s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(.9);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(.9);
+    }
+}		</style>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" /></head>
 <body data-rsssl=1 class="home page-template page-template-elementor_canvas page page-id-6 elementor-default elementor-template-canvas elementor-kit-5 elementor-page elementor-page-6">
 <div data-elementor-type="wp-page" data-elementor-id="6" class="elementor elementor-6" data-elementor-settings="[]">
@@ -252,7 +327,7 @@ src="https://www.facebook.com/tr?id=363941031423415&ev=PageView&noscript=1" />
 <section class="elementor-section elementor-top-section elementor-element elementor-element-8814b77 elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="8814b77" data-element_type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;}">
 <div class="elementor-container elementor-column-gap-default">
 <div class="elementor-row">
- <div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-0197057" data-id="0197057" data-element_type="column">
+<div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-0197057" data-id="0197057" data-element_type="column">
 <div class="elementor-column-wrap">
 <div class="elementor-widget-wrap">
 </div>
@@ -269,19 +344,18 @@ src="https://www.facebook.com/tr?id=363941031423415&ev=PageView&noscript=1" />
 <div class="elementor-widget-wrap">
 <div class="elementor-element elementor-element-e2fe643 elementor-widget elementor-widget-heading" data-id="e2fe643" data-element_type="widget" data-widget_type="heading.default">
 <div class="elementor-widget-container">
-<h2 class="elementor-heading-title elementor-size-default">Método simples e prático que uso para viver da internet e que já me fez lucrar mais de <span style="text-decoration: underline;">R$3MILHÕES</span> de reais nos últimos meses e ajudar mais de <span style="text-decoration: underline;">50.000 ALUNOS</span></h2> </div>
+<h2 class="elementor-heading-title elementor-size-default">Método simples e prático que uso para viver da internet e que já me fez lucrar mais de <span style="text-decoration: underline;">R$5MILHÕES</span> de reais nos últimos meses e ajudar mais de <span style="text-decoration: underline;">120.000 ALUNOS</span></h2> </div>
 </div>
 <div class="elementor-element elementor-element-6420991 elementor-widget elementor-widget-heading" data-id="6420991" data-element_type="widget" data-widget_type="heading.default">
 <div class="elementor-widget-container">
 <h2 class="elementor-heading-title elementor-size-default">Todas aulas são legendadas</h2> </div>
 </div>
-<div class="elementor-element elementor-element-11b3ed5 elementor-aspect-ratio-169 elementor-widget elementor-widget-video" data-id="11b3ed5" data-element_type="widget" data-settings="{&quot;youtube_url&quot;:&quot;https:\/\/www.youtube.com\/watch?v=Evpk-LsTb9o&amp;feature=youtu.be&quot;,&quot;show_image_overlay&quot;:&quot;yes&quot;,&quot;image_overlay&quot;:{&quot;url&quot;:&quot;https:\/\/brunnasiqueira.com\/wp-content\/uploads\/2021\/07\/WhatsApp-Image-2021-07-02-at-16.10.23.jpeg&quot;,&quot;id&quot;:918},&quot;video_type&quot;:&quot;youtube&quot;,&quot;controls&quot;:&quot;yes&quot;,&quot;aspect_ratio&quot;:&quot;169&quot;}" data-widget_type="video.default">
+<div class="elementor-element elementor-element-11b3ed5 elementor-aspect-ratio-169 elementor-widget elementor-widget-video" data-id="11b3ed5" data-element_type="widget" data-settings="{&quot;youtube_url&quot;:&quot;https:\/\/youtu.be\/KzDAP3E27Is&quot;,&quot;show_image_overlay&quot;:&quot;yes&quot;,&quot;image_overlay&quot;:{&quot;url&quot;:&quot;https:\/\/brunnasiqueira.com\/wp-content\/uploads\/2021\/07\/WhatsApp-Image-2021-07-02-at-16.10.23.jpeg&quot;,&quot;id&quot;:918},&quot;video_type&quot;:&quot;youtube&quot;,&quot;controls&quot;:&quot;yes&quot;,&quot;aspect_ratio&quot;:&quot;169&quot;}" data-widget_type="video.default">
 <div class="elementor-widget-container">
 <div class="elementor-wrapper elementor-fit-aspect-ratio elementor-open-inline">
 <div class="elementor-video"></div> <div class="elementor-custom-embed-image-overlay" style="background-image: url(https://brunnasiqueira.com/wp-content/uploads/2021/07/WhatsApp-Image-2021-07-02-at-16.10.23.jpeg);">
 <div class="elementor-custom-embed-play" role="button">
-<i class="eicon-play" aria-hidden="true"></i>
-<span class="elementor-screen-only">Reproduzir vídeo</span>
+<i aria-hidden="true" class="eicon-play"></i> <span class="elementor-screen-only">Reproduzir vídeo</span>
 </div>
 </div>
 </div>
@@ -291,7 +365,8 @@ src="https://www.facebook.com/tr?id=363941031423415&ev=PageView&noscript=1" />
 <div class="elementor-widget-container">
 <ul class="elementor-icon-list-items">
 <li class="elementor-icon-list-item">
-<a href="https://instagram.com/brunnasiqueira.oficial?igshid=wrar7kiy1269" target="_blank"> <span class="elementor-icon-list-text">@brunnasiqueira.oficial</span>
+<a href="https://instagram.com/brunnasiqueira.oficial?utm_medium=copy_link" target="_blank">
+<span class="elementor-icon-list-text">@brunnasiqueira.oficial</span>
 </a>
 </li>
 </ul>
@@ -300,7 +375,7 @@ src="https://www.facebook.com/tr?id=363941031423415&ev=PageView&noscript=1" />
 <div class="elementor-element elementor-element-6e94c90 elementor-align-center elementor-widget elementor-widget-button" data-id="6e94c90" data-element_type="widget" data-widget_type="button.default">
 <div class="elementor-widget-container">
 <div class="elementor-button-wrapper">
-<a href="https://go.hotmart.com/Q46622265B?ap=c0f9" class="elementor-button-link elementor-button elementor-size-xl" role="button" id="button">
+<a href="https://go.hotmart.com/Q46622265B?ap=8193" class="elementor-button-link elementor-button elementor-size-xl" role="button" id="button">
 <span class="elementor-button-content-wrapper">
 <span class="elementor-button-text">FAZER MINHA INSCRIÇÃO AGORA!</span>
 </span>
@@ -323,7 +398,7 @@ src="https://www.facebook.com/tr?id=363941031423415&ev=PageView&noscript=1" />
 <div class="elementor-element elementor-element-25e0b14 elementor-widget elementor-widget-image" data-id="25e0b14" data-element_type="widget" data-widget_type="image.default">
 <div class="elementor-widget-container">
 <div class="elementor-image">
-<img width="1472" height="2560" src="https://brunnasiqueira.com/wp-content/uploads/2021/05/Remini20210503133108571-scaled.jpg" class="attachment-full size-full" alt="" loading="lazy" srcset="https://brunnasiqueira.com/wp-content/uploads/2021/05/Remini20210503133108571-scaled.jpg 1472w, https://brunnasiqueira.com/wp-content/uploads/2021/05/Remini20210503133108571-172x300.jpg 172w, https://brunnasiqueira.com/wp-content/uploads/2021/05/Remini20210503133108571-589x1024.jpg 589w, https://brunnasiqueira.com/wp-content/uploads/2021/05/Remini20210503133108571-768x1336.jpg 768w, https://brunnasiqueira.com/wp-content/uploads/2021/05/Remini20210503133108571-883x1536.jpg 883w, https://brunnasiqueira.com/wp-content/uploads/2021/05/Remini20210503133108571-1177x2048.jpg 1177w" sizes="(max-width: 1472px) 100vw, 1472px" /> </div>
+<img width="1472" height="2560" src="https://brunnasiqueira.com/wp-content/uploads/2021/05/Remini20210503133108571-scaled.jpg" class="attachment-full size-full" alt="" loading="lazy" srcset="https://brunnasiqueira.com/wp-content/uploads/2021/05/Remini20210503133108571-scaled.jpg 1472w, https://brunnasiqueira.com/wp-content/uploads/2021/05/Remini20210503133108571-172x300.jpg 172w, https://brunnasiqueira.com/wp-content/uploads/2021/05/Remini20210503133108571-589x1024.jpg 589w, https://brunnasiqueira.com/wp-content/uploads/2021/05/Remini20210503133108571-768x1336.jpg 768w, https://brunnasiqueira.com/wp-content/uploads/2021/05/Remini20210503133108571-883x1536.jpg 883w, https://brunnasiqueira.com/wp-content/uploads/2021/05/Remini20210503133108571-1177x2048.jpg 1177w" sizes="(max-width: 1472px) 100vw, 1472px" />  </div>
 </div>
 </div>
 </div>
@@ -339,7 +414,7 @@ src="https://www.facebook.com/tr?id=363941031423415&ev=PageView&noscript=1" />
 <div class="elementor-element elementor-element-9e977df elementor-widget elementor-widget-text-editor" data-id="9e977df" data-element_type="widget" data-widget_type="text-editor.default">
 <div class="elementor-widget-container">
 <div class="elementor-text-editor elementor-clearfix">
-<p>Meu nome é Brunna Siqueira, Mineira e depois de trabalhar 12 anos na CLT (carteira assinada), hoje eu posso dizer que sou empresária aos 29 anos e tenho a minha tão sonhada liberdade financeira e posso trabalhar de qualquer lugar do mundo apenas pelo meu celular.</p><p>Conheci o Mercado Digital no dia 08 de abril de 2020, foi quando eu adquiri um curso que me ensinava como atuar no mercado, desde o início me esforçando, tive ótimos resultados, nos meus primeiros dez dias, faturei R$10.000, e antes de criar esse método em vídeo aulas, eu havia criado um e-book dando dicas de todas as minhas estratégias para ajudar afiliados iniciantes, chamado Método em 10 (10 Dicas, 10Mil, em 10 dias), foi um sucesso de vendas, no segundo mês de mercado já havia comprado meu carro à vista, e foi quando percebi que isso não se tratava mais de uma “renda extra”. Cada vez investindo em mais cursos e percebendo estratégias que funcionavam e as que não funcionavam, eu criei o meu método, que já não era possível explicar apenas em um e-book, foi assim que foi lançando o Método Upgrade que é o meu treinamento com mais de 250 vídeo aulas, com acesso a minha mentoria em grupo e suporte, no seu primeiro dia de vendas eu conquistei o NINJA HOTMART (Uma conquista que é desbloqueada quando o usuário da plataforma ganha líquido de comissão mais de R$10.000 em menos de 24horas. Depois disso comecei a explorar todas as formas possíveis de trabalhar no Marketing Digital, não só com vendas de cursos e sim fechando parcerias com lojistas e deliverys, atuando como Mentora de afiliados iniciantes, gestão de tráfego e Dropshipping.</p><p>Faturei R$200 MIL em 7 meses! Pra mim isso era mais um sinal de que este mercado só crescia e foi quando eu tomei o passo mais importante da minha vida, que era abandonar meu emprego, onde eu atuava há 6 anos, e ganhava quase R$5.000 por mês em plena Pandemia, para viver do Marketing Digital.</p> </div>
+<p>Meu nome é Brunna Siqueira, Mineira e depois de trabalhar 12 anos na CLT (carteira assinada), hoje eu posso dizer que sou empresária aos 29 anos e tenho a minha tão sonhada liberdade financeira e posso trabalhar de qualquer lugar do mundo apenas pelo meu celular.</p><p>Conheci o Mercado Digital no dia 08 de abril de 2020, foi quando eu adquiri um curso que me ensinava como atuar no mercado, desde o início me esforçando, tive ótimos resultados, nos meus primeiros dez dias, faturei R$10.000, e antes de criar esse método em vídeo aulas, eu havia criado um e-book dando dicas de todas as minhas estratégias para ajudar afiliados iniciantes, chamado Método em 10 (10 Dicas, 10Mil, em 10 dias), foi um sucesso de vendas, no segundo mês de mercado já havia comprado meu carro à vista, e foi quando percebi que isso não se tratava mais de uma “renda extra”. Cada vez investindo em mais cursos e percebendo estratégias que funcionavam e as que não funcionavam, eu criei o meu método, que já não era possível explicar apenas em um e-book, foi assim que foi lançando o Mapa do Dinheiro Urgente que é o meu treinamento com mais de 250 vídeo aulas, com acesso a minha mentoria em grupo e suporte, no seu primeiro dia de vendas eu conquistei o NINJA HOTMART (Uma conquista que é desbloqueada quando o usuário da plataforma ganha líquido de comissão mais de R$10.000 em menos de 24horas. Depois disso comecei a explorar todas as formas possíveis de trabalhar no Marketing Digital, não só com vendas de cursos e sim fechando parcerias com lojistas e deliverys, atuando como Mentora de afiliados iniciantes, gestão de tráfego e Dropshipping.</p><p>Faturei R$200 MIL em 7 meses! Pra mim isso era mais um sinal de que este mercado só crescia e foi quando eu tomei o passo mais importante da minha vida, que era abandonar meu emprego, onde eu atuava há 6 anos, e ganhava quase R$5.000 por mês em plena Pandemia, para viver do Marketing Digital.</p> </div>
 </div>
 </div>
 </div>
@@ -362,7 +437,7 @@ src="https://www.facebook.com/tr?id=363941031423415&ev=PageView&noscript=1" />
 <div class="elementor-widget-wrap">
 <div class="elementor-element elementor-element-837c786 elementor-widget elementor-widget-heading" data-id="837c786" data-element_type="widget" data-widget_type="heading.default">
 <div class="elementor-widget-container">
-<h2 class="elementor-heading-title elementor-size-default">+50.000</h2> </div>
+<h2 class="elementor-heading-title elementor-size-default">+120.000</h2> </div>
 </div>
 <div class="elementor-element elementor-element-70a8e45 elementor-widget elementor-widget-heading" data-id="70a8e45" data-element_type="widget" data-widget_type="heading.default">
 <div class="elementor-widget-container">
@@ -405,7 +480,7 @@ src="https://www.facebook.com/tr?id=363941031423415&ev=PageView&noscript=1" />
 <div class="elementor-element elementor-element-07e59ad elementor-align-center elementor-widget elementor-widget-button" data-id="07e59ad" data-element_type="widget" id="button" data-widget_type="button.default">
 <div class="elementor-widget-container">
 <div class="elementor-button-wrapper">
-<a href="https://go.hotmart.com/Q46622265B?ap=c0f9" class="elementor-button-link elementor-button elementor-size-xl" role="button" id="button">
+<a href="https://go.hotmart.com/Q46622265B?ap=8193" class="elementor-button-link elementor-button elementor-size-xl" role="button" id="button">
 <span class="elementor-button-content-wrapper">
 <span class="elementor-button-text">FAZER MINHA INSCRIÇÃO AGORA!</span>
 </span>
@@ -504,7 +579,7 @@ src="https://www.facebook.com/tr?id=363941031423415&ev=PageView&noscript=1" />
 <i aria-hidden="true" class="fas fa-check-circle"></i> </span>
 <span class="elementor-icon-list-text">Mercado de Afiliados.</span>
 </li>
- <li class="elementor-icon-list-item">
+<li class="elementor-icon-list-item">
 <span class="elementor-icon-list-icon">
 <i aria-hidden="true" class="fas fa-check-circle"></i> </span>
 <span class="elementor-icon-list-text">Aprenda tudo sobre a minha abordagem.</span>
@@ -542,7 +617,7 @@ src="https://www.facebook.com/tr?id=363941031423415&ev=PageView&noscript=1" />
 <span class="elementor-icon-list-text">Conversão de Boletos.</span>
 </li>
 <li class="elementor-icon-list-item">
-<span class="elementor-icon-list-icon">
+ <span class="elementor-icon-list-icon">
 <i aria-hidden="true" class="fas fa-check-circle"></i> </span>
 <span class="elementor-icon-list-text">Aprenda que o Instagram é seu chefe e como atuar.</span>
 </li>
@@ -590,7 +665,7 @@ src="https://www.facebook.com/tr?id=363941031423415&ev=PageView&noscript=1" />
 <div class="elementor-element elementor-element-a27d762 elementor-align-center elementor-widget elementor-widget-button" data-id="a27d762" data-element_type="widget" id="button" data-widget_type="button.default">
 <div class="elementor-widget-container">
 <div class="elementor-button-wrapper">
-<a href="https://go.hotmart.com/Q46622265B?ap=c0f9" class="elementor-button-link elementor-button elementor-size-xl" role="button" id="button">
+<a href="https://go.hotmart.com/Q46622265B?ap=8193" class="elementor-button-link elementor-button elementor-size-xl" role="button" id="button">
 <span class="elementor-button-content-wrapper">
 <span class="elementor-button-text">FAZER MINHA INSCRIÇÃO AGORA!</span>
 </span>
@@ -628,12 +703,10 @@ Veja os resultados dos meus alunos. </div>
 <div class="swiper-slide"><figure class="swiper-slide-inner"><img class="swiper-slide-image" src="https://brunnasiqueira.com/wp-content/uploads/2020/09/WhatsApp-Image-2020-09-12-at-16.38.04.jpeg" alt="WhatsApp Image 2020-09-12 at 16.38.04" /></figure></div><div class="swiper-slide"><figure class="swiper-slide-inner"><img class="swiper-slide-image" src="https://brunnasiqueira.com/wp-content/uploads/2020/09/WhatsApp-Image-2020-09-12-at-16.38.01.jpeg" alt="WhatsApp Image 2020-09-12 at 16.38.01" /></figure></div><div class="swiper-slide"><figure class="swiper-slide-inner"><img class="swiper-slide-image" src="https://brunnasiqueira.com/wp-content/uploads/2020/09/WhatsApp-Image-2020-09-12-at-16.38.02-1.jpeg" alt="WhatsApp Image 2020-09-12 at 16.38.02 (1)" /></figure></div><div class="swiper-slide"><figure class="swiper-slide-inner"><img class="swiper-slide-image" src="https://brunnasiqueira.com/wp-content/uploads/2020/09/WhatsApp-Image-2020-09-12-at-16.38.03-1.jpeg" alt="WhatsApp Image 2020-09-12 at 16.38.03 (1)" /></figure></div><div class="swiper-slide"><figure class="swiper-slide-inner"><img class="swiper-slide-image" src="https://brunnasiqueira.com/wp-content/uploads/2020/09/WhatsApp-Image-2020-09-12-at-16.38.03.jpeg" alt="WhatsApp Image 2020-09-12 at 16.38.03" /></figure></div><div class="swiper-slide"><figure class="swiper-slide-inner"><img class="swiper-slide-image" src="https://brunnasiqueira.com/wp-content/uploads/2020/09/WhatsApp-Image-2020-09-12-at-16.38.04-1.jpeg" alt="WhatsApp Image 2020-09-12 at 16.38.04 (1)" /></figure></div> </div>
 <div class="swiper-pagination"></div>
 <div class="elementor-swiper-button elementor-swiper-button-prev">
-<i class="eicon-chevron-left" aria-hidden="true"></i>
-<span class="elementor-screen-only">Anterior</span>
+<i aria-hidden="true" class="eicon-chevron-left"></i> <span class="elementor-screen-only">Anterior</span>
 </div>
 <div class="elementor-swiper-button elementor-swiper-button-next">
-<i class="eicon-chevron-right" aria-hidden="true"></i>
-<span class="elementor-screen-only">Próximo</span>
+<i aria-hidden="true" class="eicon-chevron-right"></i> <span class="elementor-screen-only">Próximo</span>
 </div>
 </div>
 </div>
@@ -641,7 +714,7 @@ Veja os resultados dos meus alunos. </div>
 <div class="elementor-element elementor-element-708a313 elementor-align-center elementor-widget elementor-widget-button" data-id="708a313" data-element_type="widget" id="button" data-widget_type="button.default">
 <div class="elementor-widget-container">
 <div class="elementor-button-wrapper">
-<a href="https://go.hotmart.com/Q46622265B?ap=c0f9" class="elementor-button-link elementor-button elementor-size-xl" role="button" id="button">
+<a href="https://go.hotmart.com/Q46622265B?ap=8193" class="elementor-button-link elementor-button elementor-size-xl" role="button" id="button">
 <span class="elementor-button-content-wrapper">
 <span class="elementor-button-text">FAZER MINHA INSCRIÇÃO AGORA!</span>
 </span>
@@ -667,7 +740,7 @@ Veja os resultados dos meus alunos. </div>
 </div>
 <div class="elementor-element elementor-element-e5e9c25 elementor-widget elementor-widget-html" data-id="e5e9c25" data-element_type="widget" data-widget_type="html.default">
 <div class="elementor-widget-container">
-<div id="section-3058440" klickart-edit-component-info=""> <link rel="stylesheet" href="//static-public.klickpages.com.br/tmp/zip/1138/styles/main.css?v=1548264172"> <section class="blocks template-erico bottom" style="background-attachment: fixed; padding-bottom: 0px;" data-klickart-delay-options="{&quot;enabled&quot;:false,&quot;selectedType&quot;:&quot;default&quot;,&quot;time&quot;:&quot;&quot;,&quot;dateTime&quot;:&quot;2019-09-07T20:30:55.581Z&quot;,&quot;timezone&quot;:&quot;-03:00&quot;,&quot;redirect&quot;:false,&quot;url&quot;:&quot;&quot;}"><div class="component-bg" style="background-color: #D1C4B4;" klickart-edit-background-mask-visible="true"></div> <div class="container"> <div class="blocks-list" id="klickart-collection-13n2h9gcpj8000"> <div class="item"> <span class="ico" style="background-attachment: scroll; border-radius: 50%;"><svg klickart-edit-icon="svg" fill="#D1C4B4" viewBox="10 10 250 250" enable-background="new 10 10 250 250"> <path d="M135.5,37c54.038,0,98,43.962,98,98c0,54.037-43.962,98-98,98s-98-43.963-98-98C37.5,80.962,81.463,37,135.5,37 M135.5,10 c-69.036,0-125,55.964-125,125c0,69.035,55.964,125,125,125c69.035,0,125-55.965,125-125C260.5,65.964,204.535,10,135.5,10 L135.5,10z"></path> <rect x="105.727" y="145.383" width="20.254" height="18.782"></rect> <path d="M135,35C79.771,35,35,79.771,35,135s44.771,100,100,100s100-44.771,100-100S190.229,35,135,35z M177.998,183.675 c0,1.116-0.908,2.025-2.03,2.025h-13.355v-40.321H140.16V185.7h-47.79c-1.121,0-2.028-0.909-2.028-2.025v-44.529l43.853-43.611 l43.802,43.611V183.675z M186.87,131.32c-2.258,2.264-5.919,2.264-8.18,0l-44.517-44.51l-44.52,44.514 c-1.131,1.125-2.611,1.69-4.092,1.69c-1.483,0-2.964-0.565-4.094-1.694c-2.263-2.261-2.263-5.924,0-8.186l18.582-18.578v-20.2 c0-2.556,2.073-4.629,4.63-4.629s4.629,2.073,4.629,4.629v10.94l24.86-24.859l52.705,52.697 C189.13,125.394,189.13,129.059,186.87,131.32z"></path> </svg></span><h3 class="title">SEGURANÇA</h3> <div class="description">Nossa missão é ajudar os alunos a ter o conhecimento necessário para conseguir tomar ações seguras obtendo previsibilidade nos negócios.</div> </div> <div class="item" style=""> <span class="ico" style="background-attachment: scroll;"><svg klickart-edit-icon="svg" fill="#D1C4B4" viewBox="10 10 250 250" enable-background="new 10 10 250 250"> <path d="M135.5,37c54.038,0,98,43.963,98,98s-43.962,98-98,98s-98-43.963-98-98S81.463,37,135.5,37 M135.5,10 c-69.036,0-125,55.965-125,125s55.964,125,125,125c69.035,0,125-55.965,125-125S204.535,10,135.5,10L135.5,10z"></path> <path d="M135,35C79.771,35,35,79.771,35,135s44.771,100,100,100s100-44.771,100-100S190.229,35,135,35z M134.995,76.805 c16.926,0,30.641,13.715,30.641,30.641c0,24.121-30.641,60.125-30.641,60.125s-30.642-35.881-30.642-60.125 C104.353,90.52,118.07,76.805,134.995,76.805z M134.999,193.195c-32.298,0-58.486-8.307-58.486-18.559 c0-8.326,17.302-15.379,41.126-17.723c2.504,3.611,4.849,6.748,6.804,9.275c-19.344,1.166-32.021,5.342-36.743,8.451 c5.532,3.646,21.966,8.771,47.299,8.771c25.338,0,41.772-5.125,47.299-8.771c-4.72-3.109-17.408-7.289-36.77-8.455 c1.949-2.523,4.294-5.666,6.793-9.277c23.848,2.346,41.169,9.396,41.166,17.729C193.487,184.893,167.302,193.195,134.999,193.195z "></path> <path d="M150.109,105.615c0-8.35-6.765-15.115-15.11-15.115c-8.345,0-15.114,6.766-15.114,15.115 c0,8.346,6.77,15.111,15.114,15.111C143.345,120.727,150.109,113.961,150.109,105.615z M127.566,105.615 c0-4.104,3.325-7.434,7.429-7.434c4.103,0,7.434,3.33,7.434,7.434s-3.331,7.43-7.434,7.43 C130.891,113.045,127.566,109.719,127.566,105.615z"></path> </svg></span><h3 class="title">LIBERDADE</h3> <div class="description">Nossa missão é ajudar os alunos a ter liberdade de tempo para aproveitar a vida da melhor forma possível com plenitude, paz e felicidade.</div> </div> <div class="item" style=""> <span class="ico" style="background-attachment: scroll;"><svg klickart-edit-icon="svg" fill="#D1C4B4" viewBox="310 150 1172 1632"><path d="M1444 548l-292 292v824q0 46-33 79t-79 33-79-33-33-79v-384h-64v384q0 46-33 79t-79 33-79-33-33-79v-824l-292-292q-28-28-28-68t28-68 68-28 68 28l228 228h368l228-228q28-28 68-28t68 28 28 68-28 68zm-324-164q0 93-65.5 158.5t-158.5 65.5-158.5-65.5-65.5-158.5 65.5-158.5 158.5-65.5 158.5 65.5 65.5 158.5z"></path></svg></span><h3 class="title">CONFORTO</h3> <div class="description">Nossa missão é ajudar os alunos a criar um negócio online para ter liberdade, comodidade, conforto e tranquilidade.</div> </div> <div class="item" style=""> <span class="ico" style="background-attachment: scroll;"><svg klickart-edit-icon="svg" fill="#D1C4B4" viewBox="10 10 250 250" enable-background="new 10 10 250 250"> <path d="M135,37c54.038,0,98,43.963,98,98s-43.962,98-98,98c-54.037,0-98-43.963-98-98S80.963,37,135,37 M135,10 C65.965,10,10,65.965,10,135s55.965,125,125,125s125-55.965,125-125S204.035,10,135,10L135,10z"></path> <path d="M135.066,86.287c-26.926,0-48.736,21.811-48.736,48.734c0,26.926,21.832,48.736,48.736,48.736 c26.902,0,48.734-21.811,48.734-48.736C183.801,108.098,161.99,86.287,135.066,86.287z M141.271,163.85v2.6 c0,2.775-2.25,5.027-5.027,5.027h-3.648c-2.775,0-5.027-2.252-5.027-5.027v-2.186c-2.6-0.699-5.965-2.162-8.195-3.867 c-2.012-1.553-3.104-3.322-3.104-5.508c0-2.994,2.428-6.141,5.771-6.141c1.813,0,3.322,0.896,4.609,1.988 c2.559,1.857,4.678,2.119,6.994,2.119c4.043,0,7.518-2.076,7.518-6.25c0-2.492-1.945-4.174-7.779-6.861 c-7.344-3.41-16.086-7.584-16.086-17.42c0-6.184,3.891-12.479,10.271-15.166v-3.146c0-2.777,2.252-5.027,5.027-5.027h3.648 c2.777,0,5.027,2.25,5.027,5.027v2.861c2.076,0.721,4.086,1.771,5.9,3.146c2.121,1.486,3.279,3.41,3.279,5.66 c0,2.996-2.426,6.143-5.77,6.143c-1.791,0-3.279-0.721-4.568-1.814c-1.703-1.332-3.541-2.119-5.66-2.119 c-2.994,0-4.873,0.961-4.873,4.174c0,3.584,4.438,4.676,8.938,6.861c8.852,4.307,15.102,8.307,15.123,17.311 C153.641,155.215,148.615,161.379,141.271,163.85z"></path> <path d="M135,35C79.771,35,35,79.771,35,135s44.771,100,100,100s100-44.771,100-100S190.229,35,135,35z M135,203.295 c-37.742,0-68.295-30.553-68.295-68.295S97.258,66.705,135,66.705S203.295,97.258,203.295,135S172.742,203.295,135,203.295z"></path> </svg></span><h3 class="title">RENTABILIDADE</h3> <div class="description">As melhores técnicas e estratégias criar um negócio com o Marketing Digital aplicando o simples que funciona. </div> </div> <div class="item" style=""> <span class="ico" style="background-attachment: scroll;"><svg klickart-edit-icon="svg" fill="#D1C4B4" xmlns="http://www.w3.org/2000/svg" width="86px" height="86px" x="0px" y="0px" viewBox="0 0 29.869 29.869" style="enable-background:new 0 0 29.869 29.869;" xml:space="preserve" xmlns:xlink="http://www.w3.org/1999/xlink"><g><path d="M24.032,11.541c0.286,0,0.518,0.232,0.518,0.518s-0.232,0.518-0.518,0.518s-0.518-0.232-0.518-0.518S23.746,11.541,24.032,11.541z M21.686,11.542c-0.583,0-1.055,0.472-1.055,1.055s0.472,1.055,1.055,1.055s1.055-0.472,1.055-1.055C22.741,12.014,22.269,11.542,21.686,11.542z M22.742,10.134c0,0.388,0.315,0.703,0.703,0.703c0.388,0,0.703-0.315,0.703-0.703c0-0.388-0.315-0.703-0.703-0.703C23.057,9.431,22.742,9.746,22.742,10.134z M29.672,12.495c-0.26,0.259-0.684,0.259-0.946,0L28.4,12.167l-8.666,8.668l-4.45-7.487l7.148-7.15l-0.328-0.326c-0.261-0.261-0.259-0.684,0-0.945c0.261-0.26,0.685-0.263,0.946-0.001l6.622,6.623C29.934,11.809,29.934,12.233,29.672,12.495z M27.404,11.174l-3.977-3.979l-5.53,5.559l-1.112,1.112h7.944L27.404,11.174z M10.485,18.244c0,0.61,0.494,1.104,1.104,1.104s1.104-0.494,1.104-1.104c0-0.61-0.494-1.104-1.104-1.104S10.485,17.634,10.485,18.244z M8.429,16.569c-0.595-0.001-1.076,0.483-1.076,1.075c0,0.594,0.482,1.079,1.076,1.079s1.077-0.485,1.077-1.079C9.506,17.052,9.022,16.567,8.429,16.569z M11.462,15.748c0-0.436-0.353-0.789-0.789-0.789s-0.789,0.353-0.789,0.789s0.353,0.789,0.789,0.789S11.462,16.184,11.462,15.748z M19.853,22.986c0.671,1.987-0.067,3.83-2.206,3.83H2.446c-2.139,0-2.876-1.826-2.208-3.814c0,0,2.636-4.912,6.932-11.962V6.957H6.904C6.52,6.958,6.207,6.645,6.207,6.263c0.001-0.382,0.314-0.695,0.696-0.696h1.106L7.353,3.053h5.34l-0.659,2.515h1.157c0.383-0.001,0.695,0.313,0.695,0.695c-0.002,0.382-0.312,0.694-0.696,0.694h-0.265v4.083C17.219,18.091,19.853,22.987,19.853,22.986z M16.638,20.318c-0.296-0.575-3.857-6.755-4.947-8.541l-0.169-0.278H8.57l-0.168,0.278c-1.11,1.823-4.484,7.719-4.86,8.354c-0.028,0.055-0.06,0.119-0.093,0.186v0.001H16.638z"></path></g></svg></span><h3 class="title"><b class="medium-b">SEM ESQUEMAS</b></h3> <div class="description">O método do curso <b class="medium-b">não envolve em nenhum momento esquemas de pirâmide, multinível ou coisas do tipo. Não se trata de promessas de dinheiro fácil.</b> O MDU (Metodo Upgrade) é um curso 100% Online que ensina formas de criar um negócio digital sustentável e lucrativo.</div> </div> </div> </div></section> </div> </div>
+<div id="section-3058440" klickart-edit-component-info=""> <link rel="stylesheet" href="//static-public.klickpages.com.br/tmp/zip/1138/styles/main.css?v=1548264172"> <section class="blocks template-erico bottom" style="background-attachment: fixed; padding-bottom: 0px;" data-klickart-delay-options="{&quot;enabled&quot;:false,&quot;selectedType&quot;:&quot;default&quot;,&quot;time&quot;:&quot;&quot;,&quot;dateTime&quot;:&quot;2019-09-07T20:30:55.581Z&quot;,&quot;timezone&quot;:&quot;-03:00&quot;,&quot;redirect&quot;:false,&quot;url&quot;:&quot;&quot;}"><div class="component-bg" style="background-color: #D1C4B4;" klickart-edit-background-mask-visible="true"></div> <div class="container"> <div class="blocks-list" id="klickart-collection-13n2h9gcpj8000"> <div class="item"> <span class="ico" style="background-attachment: scroll; border-radius: 50%;"><svg klickart-edit-icon="svg" fill="#D1C4B4" viewBox="10 10 250 250" enable-background="new 10 10 250 250"> <path d="M135.5,37c54.038,0,98,43.962,98,98c0,54.037-43.962,98-98,98s-98-43.963-98-98C37.5,80.962,81.463,37,135.5,37 M135.5,10 c-69.036,0-125,55.964-125,125c0,69.035,55.964,125,125,125c69.035,0,125-55.965,125-125C260.5,65.964,204.535,10,135.5,10 L135.5,10z"></path> <rect x="105.727" y="145.383" width="20.254" height="18.782"></rect> <path d="M135,35C79.771,35,35,79.771,35,135s44.771,100,100,100s100-44.771,100-100S190.229,35,135,35z M177.998,183.675 c0,1.116-0.908,2.025-2.03,2.025h-13.355v-40.321H140.16V185.7h-47.79c-1.121,0-2.028-0.909-2.028-2.025v-44.529l43.853-43.611 l43.802,43.611V183.675z M186.87,131.32c-2.258,2.264-5.919,2.264-8.18,0l-44.517-44.51l-44.52,44.514 c-1.131,1.125-2.611,1.69-4.092,1.69c-1.483,0-2.964-0.565-4.094-1.694c-2.263-2.261-2.263-5.924,0-8.186l18.582-18.578v-20.2 c0-2.556,2.073-4.629,4.63-4.629s4.629,2.073,4.629,4.629v10.94l24.86-24.859l52.705,52.697 C189.13,125.394,189.13,129.059,186.87,131.32z"></path> </svg></span><h3 class="title">SEGURANÇA</h3> <div class="description">Nossa missão é ajudar os alunos a ter o conhecimento necessário para conseguir tomar ações seguras obtendo previsibilidade nos negócios.</div> </div> <div class="item" style=""> <span class="ico" style="background-attachment: scroll;"><svg klickart-edit-icon="svg" fill="#D1C4B4" viewBox="10 10 250 250" enable-background="new 10 10 250 250"> <path d="M135.5,37c54.038,0,98,43.963,98,98s-43.962,98-98,98s-98-43.963-98-98S81.463,37,135.5,37 M135.5,10 c-69.036,0-125,55.965-125,125s55.964,125,125,125c69.035,0,125-55.965,125-125S204.535,10,135.5,10L135.5,10z"></path> <path d="M135,35C79.771,35,35,79.771,35,135s44.771,100,100,100s100-44.771,100-100S190.229,35,135,35z M134.995,76.805 c16.926,0,30.641,13.715,30.641,30.641c0,24.121-30.641,60.125-30.641,60.125s-30.642-35.881-30.642-60.125 C104.353,90.52,118.07,76.805,134.995,76.805z M134.999,193.195c-32.298,0-58.486-8.307-58.486-18.559 c0-8.326,17.302-15.379,41.126-17.723c2.504,3.611,4.849,6.748,6.804,9.275c-19.344,1.166-32.021,5.342-36.743,8.451 c5.532,3.646,21.966,8.771,47.299,8.771c25.338,0,41.772-5.125,47.299-8.771c-4.72-3.109-17.408-7.289-36.77-8.455 c1.949-2.523,4.294-5.666,6.793-9.277c23.848,2.346,41.169,9.396,41.166,17.729C193.487,184.893,167.302,193.195,134.999,193.195z "></path> <path d="M150.109,105.615c0-8.35-6.765-15.115-15.11-15.115c-8.345,0-15.114,6.766-15.114,15.115 c0,8.346,6.77,15.111,15.114,15.111C143.345,120.727,150.109,113.961,150.109,105.615z M127.566,105.615 c0-4.104,3.325-7.434,7.429-7.434c4.103,0,7.434,3.33,7.434,7.434s-3.331,7.43-7.434,7.43 C130.891,113.045,127.566,109.719,127.566,105.615z"></path> </svg></span><h3 class="title">LIBERDADE</h3> <div class="description">Nossa missão é ajudar os alunos a ter liberdade de tempo para aproveitar a vida da melhor forma possível com plenitude, paz e felicidade.</div> </div> <div class="item" style=""> <span class="ico" style="background-attachment: scroll;"><svg klickart-edit-icon="svg" fill="#D1C4B4" viewBox="310 150 1172 1632"><path d="M1444 548l-292 292v824q0 46-33 79t-79 33-79-33-33-79v-384h-64v384q0 46-33 79t-79 33-79-33-33-79v-824l-292-292q-28-28-28-68t28-68 68-28 68 28l228 228h368l228-228q28-28 68-28t68 28 28 68-28 68zm-324-164q0 93-65.5 158.5t-158.5 65.5-158.5-65.5-65.5-158.5 65.5-158.5 158.5-65.5 158.5 65.5 65.5 158.5z"></path></svg></span><h3 class="title">CONFORTO</h3> <div class="description">Nossa missão é ajudar os alunos a criar um negócio online para ter liberdade, comodidade, conforto e tranquilidade.</div> </div> <div class="item" style=""> <span class="ico" style="background-attachment: scroll;"><svg klickart-edit-icon="svg" fill="#D1C4B4" viewBox="10 10 250 250" enable-background="new 10 10 250 250"> <path d="M135,37c54.038,0,98,43.963,98,98s-43.962,98-98,98c-54.037,0-98-43.963-98-98S80.963,37,135,37 M135,10 C65.965,10,10,65.965,10,135s55.965,125,125,125s125-55.965,125-125S204.035,10,135,10L135,10z"></path> <path d="M135.066,86.287c-26.926,0-48.736,21.811-48.736,48.734c0,26.926,21.832,48.736,48.736,48.736 c26.902,0,48.734-21.811,48.734-48.736C183.801,108.098,161.99,86.287,135.066,86.287z M141.271,163.85v2.6 c0,2.775-2.25,5.027-5.027,5.027h-3.648c-2.775,0-5.027-2.252-5.027-5.027v-2.186c-2.6-0.699-5.965-2.162-8.195-3.867 c-2.012-1.553-3.104-3.322-3.104-5.508c0-2.994,2.428-6.141,5.771-6.141c1.813,0,3.322,0.896,4.609,1.988 c2.559,1.857,4.678,2.119,6.994,2.119c4.043,0,7.518-2.076,7.518-6.25c0-2.492-1.945-4.174-7.779-6.861 c-7.344-3.41-16.086-7.584-16.086-17.42c0-6.184,3.891-12.479,10.271-15.166v-3.146c0-2.777,2.252-5.027,5.027-5.027h3.648 c2.777,0,5.027,2.25,5.027,5.027v2.861c2.076,0.721,4.086,1.771,5.9,3.146c2.121,1.486,3.279,3.41,3.279,5.66 c0,2.996-2.426,6.143-5.77,6.143c-1.791,0-3.279-0.721-4.568-1.814c-1.703-1.332-3.541-2.119-5.66-2.119 c-2.994,0-4.873,0.961-4.873,4.174c0,3.584,4.438,4.676,8.938,6.861c8.852,4.307,15.102,8.307,15.123,17.311 C153.641,155.215,148.615,161.379,141.271,163.85z"></path> <path d="M135,35C79.771,35,35,79.771,35,135s44.771,100,100,100s100-44.771,100-100S190.229,35,135,35z M135,203.295 c-37.742,0-68.295-30.553-68.295-68.295S97.258,66.705,135,66.705S203.295,97.258,203.295,135S172.742,203.295,135,203.295z"></path> </svg></span><h3 class="title">RENTABILIDADE</h3> <div class="description">As melhores técnicas e estratégias criar um negócio com o Marketing Digital aplicando o simples que funciona. </div> </div> <div class="item" style=""> <span class="ico" style="background-attachment: scroll;"><svg klickart-edit-icon="svg" fill="#D1C4B4" xmlns="http://www.w3.org/2000/svg" width="86px" height="86px" x="0px" y="0px" viewBox="0 0 29.869 29.869" style="enable-background:new 0 0 29.869 29.869;" xml:space="preserve" xmlns:xlink="http://www.w3.org/1999/xlink"><g><path d="M24.032,11.541c0.286,0,0.518,0.232,0.518,0.518s-0.232,0.518-0.518,0.518s-0.518-0.232-0.518-0.518S23.746,11.541,24.032,11.541z M21.686,11.542c-0.583,0-1.055,0.472-1.055,1.055s0.472,1.055,1.055,1.055s1.055-0.472,1.055-1.055C22.741,12.014,22.269,11.542,21.686,11.542z M22.742,10.134c0,0.388,0.315,0.703,0.703,0.703c0.388,0,0.703-0.315,0.703-0.703c0-0.388-0.315-0.703-0.703-0.703C23.057,9.431,22.742,9.746,22.742,10.134z M29.672,12.495c-0.26,0.259-0.684,0.259-0.946,0L28.4,12.167l-8.666,8.668l-4.45-7.487l7.148-7.15l-0.328-0.326c-0.261-0.261-0.259-0.684,0-0.945c0.261-0.26,0.685-0.263,0.946-0.001l6.622,6.623C29.934,11.809,29.934,12.233,29.672,12.495z M27.404,11.174l-3.977-3.979l-5.53,5.559l-1.112,1.112h7.944L27.404,11.174z M10.485,18.244c0,0.61,0.494,1.104,1.104,1.104s1.104-0.494,1.104-1.104c0-0.61-0.494-1.104-1.104-1.104S10.485,17.634,10.485,18.244z M8.429,16.569c-0.595-0.001-1.076,0.483-1.076,1.075c0,0.594,0.482,1.079,1.076,1.079s1.077-0.485,1.077-1.079C9.506,17.052,9.022,16.567,8.429,16.569z M11.462,15.748c0-0.436-0.353-0.789-0.789-0.789s-0.789,0.353-0.789,0.789s0.353,0.789,0.789,0.789S11.462,16.184,11.462,15.748z M19.853,22.986c0.671,1.987-0.067,3.83-2.206,3.83H2.446c-2.139,0-2.876-1.826-2.208-3.814c0,0,2.636-4.912,6.932-11.962V6.957H6.904C6.52,6.958,6.207,6.645,6.207,6.263c0.001-0.382,0.314-0.695,0.696-0.696h1.106L7.353,3.053h5.34l-0.659,2.515h1.157c0.383-0.001,0.695,0.313,0.695,0.695c-0.002,0.382-0.312,0.694-0.696,0.694h-0.265v4.083C17.219,18.091,19.853,22.987,19.853,22.986z M16.638,20.318c-0.296-0.575-3.857-6.755-4.947-8.541l-0.169-0.278H8.57l-0.168,0.278c-1.11,1.823-4.484,7.719-4.86,8.354c-0.028,0.055-0.06,0.119-0.093,0.186v0.001H16.638z"></path></g></svg></span><h3 class="title"><b class="medium-b">SEM ESQUEMAS</b></h3> <div class="description">O método do curso <b class="medium-b">não envolve em nenhum momento esquemas de pirâmide, multinível ou coisas do tipo. Não se trata de promessas de dinheiro fácil.</b> O MDU (Metodo do Dinheiro Urgente) é um curso 100% Online que ensina formas de criar um negócio digital sustentável e lucrativo.</div> </div> </div> </div></section> </div> </div>
 </div>
 </div>
 </div>
@@ -697,7 +770,7 @@ Veja os resultados dos meus alunos. </div>
 <div class="elementor-widget-container">
 <div class="elementor-text-editor elementor-clearfix">
 <h3 class="satisfaction-title"><b class="medium-b">Satisfação garantida ou seu dinheiro de volta</b></h1>
-<div class="satisfaction-text"><span class="klickart-font"><b class="medium-b">Até 7 dias depois do pagamento, você pode cancelar </b></span><span class="klickart-font"><b class="medium-b">por qualquer motivo, e devolvemos todo o valor pago.</b></span></div> </div>
+<div class="satisfaction-text"><span class="klickart-font"><b class="medium-b">Até 7 dias depois do pagamento, você pode cancelar </b></span><span class="klickart-font"><b class="medium-b">por qualquer motivo, e devolvemos todo o valor pago.</b></span></div>  </div>
 </div>
 </div>
 </div>
@@ -727,7 +800,7 @@ Veja os resultados dos meus alunos. </div>
 </span>
 <a href="" class="elementor-toggle-title">Em quanto tempo terei resultados?</a>
 </div>
-<div id="elementor-tab-content-2311" class="elementor-tab-content elementor-clearfix" data-tab="1" role="tabpanel" aria-labelledby="elementor-tab-title-2311"><p>O tempo de resultado varia de aluno para aluno.</p><p>A proposta do método Upgrade é uma mentoria para iniciantes que vai ter ajudar a trabalhar do zero com o Marketing Digital.</p><p>O Método Upgrade veio com tudo para pegar você pela mão, que não sabe absolutamente nada de Marketing Digital e te ensinar do Zero!</p></div>
+<div id="elementor-tab-content-2311" class="elementor-tab-content elementor-clearfix" data-tab="1" role="tabpanel" aria-labelledby="elementor-tab-title-2311"><p>O tempo de resultado varia de aluno para aluno.</p><p>A proposta do Mapa do Dinheiro Urgente é uma mentoria para iniciantes que vai ter ajudar a trabalhar do zero com o Marketing Digital.</p><p>O Mapa do Dinheiro Urgente veio com tudo para pegar você pela mão, que não sabe absolutamente nada de Marketing Digital e te ensinar do Zero!</p></div>
 </div>
 <div class="elementor-toggle-item">
 <div id="elementor-tab-title-2312" class="elementor-tab-title" data-tab="2" role="tab" aria-controls="elementor-tab-content-2312" aria-expanded="false">
@@ -775,7 +848,7 @@ Veja os resultados dos meus alunos. </div>
 <div class="elementor-element elementor-element-6297a7e elementor-align-center elementor-widget elementor-widget-button" data-id="6297a7e" data-element_type="widget" data-widget_type="button.default">
 <div class="elementor-widget-container">
 <div class="elementor-button-wrapper">
-<a href="https://go.hotmart.com/Q46622265B?ap=c0f9" class="elementor-button-link elementor-button elementor-size-xl" role="button" id="button">
+<a href="https://go.hotmart.com/Q46622265B?ap=8193" class="elementor-button-link elementor-button elementor-size-xl" role="button" id="button">
 <span class="elementor-button-content-wrapper">
 <span class="elementor-button-text">FAZER MINHA INSCRIÇÃO AGORA!</span>
 </span>
@@ -798,8 +871,8 @@ Veja os resultados dos meus alunos. </div>
 <div class="elementor-element elementor-element-480b72e elementor-widget elementor-widget-image" data-id="480b72e" data-element_type="widget" data-widget_type="image.default">
 <div class="elementor-widget-container">
 <div class="elementor-image">
-<a href="https://go.hotmart.com/Q46622265B?ap=c0f9">
-<img width="1877" height="1056" src="https://brunnasiqueira.com/wp-content/uploads/2021/07/WhatsApp-Image-2021-07-02-at-16.10.23.png" class="attachment-full size-full" alt="" loading="lazy" srcset="https://brunnasiqueira.com/wp-content/uploads/2021/07/WhatsApp-Image-2021-07-02-at-16.10.23.png 1877w, https://brunnasiqueira.com/wp-content/uploads/2021/07/WhatsApp-Image-2021-07-02-at-16.10.23-300x169.png 300w, https://brunnasiqueira.com/wp-content/uploads/2021/07/WhatsApp-Image-2021-07-02-at-16.10.23-1024x576.png 1024w, https://brunnasiqueira.com/wp-content/uploads/2021/07/WhatsApp-Image-2021-07-02-at-16.10.23-768x432.png 768w, https://brunnasiqueira.com/wp-content/uploads/2021/07/WhatsApp-Image-2021-07-02-at-16.10.23-1536x864.png 1536w" sizes="(max-width: 1877px) 100vw, 1877px" /> </a>
+<a href="https://go.hotmart.com/Q46622265B?ap=8193">
+<img width="1280" height="720" src="https://brunnasiqueira.com/wp-content/uploads/2021/11/WhatsApp-Image-2021-11-01-at-13.32.58.jpeg" class="attachment-full size-full" alt="" loading="lazy" srcset="https://brunnasiqueira.com/wp-content/uploads/2021/11/WhatsApp-Image-2021-11-01-at-13.32.58.jpeg 1280w, https://brunnasiqueira.com/wp-content/uploads/2021/11/WhatsApp-Image-2021-11-01-at-13.32.58-300x169.jpeg 300w, https://brunnasiqueira.com/wp-content/uploads/2021/11/WhatsApp-Image-2021-11-01-at-13.32.58-1024x576.jpeg 1024w, https://brunnasiqueira.com/wp-content/uploads/2021/11/WhatsApp-Image-2021-11-01-at-13.32.58-768x432.jpeg 768w" sizes="(max-width: 1280px) 100vw, 1280px" /> </a>
 </div>
 </div>
 </div>
@@ -818,22 +891,25 @@ Veja os resultados dos meus alunos. </div>
 <div class="elementor-element elementor-element-32c132a elementor-widget elementor-widget-text-editor" data-id="32c132a" data-element_type="widget" data-widget_type="text-editor.default">
 <div class="elementor-widget-container">
 <div class="elementor-text-editor elementor-clearfix">
-Metodo Upgrade <i class="fa fa-copyright"></i> 2021 Todos direitos reservados </div>
+<p>Mapa do Dinheiro Urgente <i class="fa fa-copyright"></i> 2021 Todos direitos reservados</p> </div>
 </div>
 </div>
 <div class="elementor-element elementor-element-4884563 elementor-icon-list--layout-inline elementor-align-center elementor-list-item-link-full_width elementor-widget elementor-widget-icon-list" data-id="4884563" data-element_type="widget" data-widget_type="icon-list.default">
 <div class="elementor-widget-container">
 <ul class="elementor-icon-list-items elementor-inline-items">
 <li class="elementor-icon-list-item elementor-inline-item">
-<a href="/politica-de-privacidade"> <span class="elementor-icon-list-text">Politica de privacidade</span>
+<a href="/politica-de-privacidade">
+<span class="elementor-icon-list-text">Politica de privacidade</span>
 </a>
 </li>
 <li class="elementor-icon-list-item elementor-inline-item">
-<a href="/declaracao-de-ganhos"> <span class="elementor-icon-list-text">Termos de uso</span>
+<a href="/declaracao-de-ganhos">
+<span class="elementor-icon-list-text">Termos de uso</span>
 </a>
 </li>
 <li class="elementor-icon-list-item elementor-inline-item">
-<a href="/declaracao-de-ganhos"> <span class="elementor-icon-list-text">Declaração de Ganhos</span>
+<a href="/declaracao-de-ganhos">
+<span class="elementor-icon-list-text">Declaração de Ganhos</span>
 </a>
 </li>
 </ul>
@@ -857,30 +933,42 @@ Metodo Upgrade <i class="fa fa-copyright"></i> 2021 Todos direitos reservados </
       }, false );
     </script>
 
-<div id='fb-pxl-ajax-code'></div><link rel='stylesheet' id='e-animations-css' href='https://brunnasiqueira.com/wp-content/plugins/elementor/assets/lib/animations/animations.min.css?ver=3.3.1' type='text/css' media='all' />
-<script type='text/javascript' src='https://brunnasiqueira.com/wp-includes/js/wp-embed.min.js?ver=5.7.2' id='wp-embed-js'></script>
-<script type='text/javascript' src='https://brunnasiqueira.com/wp-content/plugins/elementor/assets/js/webpack.runtime.min.js?ver=3.3.1' id='elementor-webpack-runtime-js'></script>
-<script type='text/javascript' src='https://brunnasiqueira.com/wp-includes/js/jquery/jquery.min.js?ver=3.5.1' id='jquery-core-js'></script>
-<script type='text/javascript' src='https://brunnasiqueira.com/wp-includes/js/jquery/jquery-migrate.min.js?ver=3.3.2' id='jquery-migrate-js'></script>
-<script type='text/javascript' src='https://brunnasiqueira.com/wp-content/plugins/elementor/assets/js/frontend-modules.min.js?ver=3.3.1' id='elementor-frontend-modules-js'></script>
+<div id='fb-pxl-ajax-code'></div><link rel='stylesheet' id='e-animations-css' href='https://brunnasiqueira.com/wp-content/plugins/elementor/assets/lib/animations/animations.min.css?ver=3.5.3' type='text/css' media='all' />
+<script type='text/javascript' src='https://brunnasiqueira.com/wp-content/plugins/mask-form-elementor/js/jquery.mask.min.js?ver=1.0' id='jquery.mask.min.js-js'></script>
+<script type='text/javascript' src='https://brunnasiqueira.com/wp-content/plugins/mask-form-elementor/js/maskformelementor.js?ver=1.0' id='maskformelementor.js-js'></script>
+<script type='text/javascript' src='https://brunnasiqueira.com/wp-content/plugins/elementskit-lite/libs/framework/assets/js/frontend-script.js?ver=2.5.1' id='elementskit-framework-js-frontend-js'></script>
+<script type='text/javascript' id='elementskit-framework-js-frontend-js-after'>
+		var elementskit = {
+            resturl: 'https://brunnasiqueira.com/wp-json/elementskit/v1/',
+        }
+
+		
+</script>
+<script type='text/javascript' src='https://brunnasiqueira.com/wp-content/plugins/elementskit-lite/widgets/init/assets/js/widget-scripts.js?ver=2.5.1' id='ekit-widget-scripts-js'></script>
+<script type='text/javascript' src='https://brunnasiqueira.com/wp-includes/js/wp-embed.min.js?ver=5.8.3' id='wp-embed-js'></script>
+<script type='text/javascript' src='https://brunnasiqueira.com/wp-content/plugins/elementor/assets/js/webpack.runtime.min.js?ver=3.5.3' id='elementor-webpack-runtime-js'></script>
+<script type='text/javascript' src='https://brunnasiqueira.com/wp-content/plugins/elementor/assets/js/frontend-modules.min.js?ver=3.5.3' id='elementor-frontend-modules-js'></script>
 <script type='text/javascript' src='https://brunnasiqueira.com/wp-content/plugins/elementor-pro/assets/lib/sticky/jquery.sticky.min.js?ver=3.0.10' id='elementor-sticky-js'></script>
 <script type='text/javascript' id='elementor-pro-frontend-js-before'>
-var ElementorProFrontendConfig = {"ajaxurl":"https:\/\/brunnasiqueira.com\/wp-admin\/admin-ajax.php","nonce":"2fe10c4324","i18n":{"toc_no_headings_found":"No headings were found on this page."},"shareButtonsNetworks":{"facebook":{"title":"Facebook","has_counter":true},"twitter":{"title":"Twitter"},"google":{"title":"Google+","has_counter":true},"linkedin":{"title":"LinkedIn","has_counter":true},"pinterest":{"title":"Pinterest","has_counter":true},"reddit":{"title":"Reddit","has_counter":true},"vk":{"title":"VK","has_counter":true},"odnoklassniki":{"title":"OK","has_counter":true},"tumblr":{"title":"Tumblr"},"digg":{"title":"Digg"},"skype":{"title":"Skype"},"stumbleupon":{"title":"StumbleUpon","has_counter":true},"mix":{"title":"Mix"},"telegram":{"title":"Telegram"},"pocket":{"title":"Pocket","has_counter":true},"xing":{"title":"XING","has_counter":true},"whatsapp":{"title":"WhatsApp"},"email":{"title":"Email"},"print":{"title":"Print"}},"facebook_sdk":{"lang":"pt_BR","app_id":""},"lottie":{"defaultAnimationUrl":"https:\/\/brunnasiqueira.com\/wp-content\/plugins\/elementor-pro\/modules\/lottie\/assets\/animations\/default.json"}};
+var ElementorProFrontendConfig = {"ajaxurl":"https:\/\/brunnasiqueira.com\/wp-admin\/admin-ajax.php","nonce":"6b49993c87","i18n":{"toc_no_headings_found":"No headings were found on this page."},"shareButtonsNetworks":{"facebook":{"title":"Facebook","has_counter":true},"twitter":{"title":"Twitter"},"google":{"title":"Google+","has_counter":true},"linkedin":{"title":"LinkedIn","has_counter":true},"pinterest":{"title":"Pinterest","has_counter":true},"reddit":{"title":"Reddit","has_counter":true},"vk":{"title":"VK","has_counter":true},"odnoklassniki":{"title":"OK","has_counter":true},"tumblr":{"title":"Tumblr"},"digg":{"title":"Digg"},"skype":{"title":"Skype"},"stumbleupon":{"title":"StumbleUpon","has_counter":true},"mix":{"title":"Mix"},"telegram":{"title":"Telegram"},"pocket":{"title":"Pocket","has_counter":true},"xing":{"title":"XING","has_counter":true},"whatsapp":{"title":"WhatsApp"},"email":{"title":"Email"},"print":{"title":"Print"}},"facebook_sdk":{"lang":"pt_BR","app_id":""},"lottie":{"defaultAnimationUrl":"https:\/\/brunnasiqueira.com\/wp-content\/plugins\/elementor-pro\/modules\/lottie\/assets\/animations\/default.json"}};
 </script>
 <script type='text/javascript' src='https://brunnasiqueira.com/wp-content/plugins/elementor-pro/assets/js/frontend.min.js?ver=3.0.10' id='elementor-pro-frontend-js'></script>
 <script type='text/javascript' src='https://brunnasiqueira.com/wp-content/plugins/elementor/assets/lib/waypoints/waypoints.min.js?ver=4.0.2' id='elementor-waypoints-js'></script>
 <script type='text/javascript' src='https://brunnasiqueira.com/wp-includes/js/jquery/ui/core.min.js?ver=1.12.1' id='jquery-ui-core-js'></script>
 <script type='text/javascript' src='https://brunnasiqueira.com/wp-content/plugins/elementor/assets/lib/swiper/swiper.min.js?ver=5.3.6' id='swiper-js'></script>
-<script type='text/javascript' src='https://brunnasiqueira.com/wp-content/plugins/elementor/assets/lib/share-link/share-link.min.js?ver=3.3.1' id='share-link-js'></script>
-<script type='text/javascript' src='https://brunnasiqueira.com/wp-content/plugins/elementor/assets/lib/dialog/dialog.min.js?ver=4.8.1' id='elementor-dialog-js'></script>
+<script type='text/javascript' src='https://brunnasiqueira.com/wp-content/plugins/elementor/assets/lib/share-link/share-link.min.js?ver=3.5.3' id='share-link-js'></script>
+<script type='text/javascript' src='https://brunnasiqueira.com/wp-content/plugins/elementor/assets/lib/dialog/dialog.min.js?ver=4.9.0' id='elementor-dialog-js'></script>
 <script type='text/javascript' id='elementor-frontend-js-before'>
-var elementorFrontendConfig = {"environmentMode":{"edit":false,"wpPreview":false,"isScriptDebug":false},"i18n":{"shareOnFacebook":"Compartilhar no Facebook","shareOnTwitter":"Compartilhar no Twitter","pinIt":"Fixar","download":"Baixar","downloadImage":"Baixar imagem","fullscreen":"Tela cheia","zoom":"Zoom","share":"Compartilhar","playVideo":"Reproduzir v\u00eddeo","previous":"Anterior","next":"Pr\u00f3ximo","close":"Fechar"},"is_rtl":false,"breakpoints":{"xs":0,"sm":480,"md":768,"lg":1025,"xl":1440,"xxl":1600},"responsive":{"breakpoints":{"mobile":{"label":"Mobile","value":767,"direction":"max","is_enabled":true,"default_value":767},"mobile_extra":{"label":"Dispositivo m\u00f3vel extra","value":880,"direction":"max","is_enabled":false,"default_value":880},"tablet":{"label":"Tablet","value":1024,"direction":"max","is_enabled":true,"default_value":1024},"tablet_extra":{"label":"Tablet extra","value":1365,"direction":"max","is_enabled":false,"default_value":1365},"laptop":{"label":"Laptop","value":1620,"direction":"max","is_enabled":false,"default_value":1620},"widescreen":{"label":"Widescreen","value":2400,"direction":"min","is_enabled":false,"default_value":2400}}},"version":"3.3.1","is_static":false,"experimentalFeatures":{"e_import_export":true,"landing-pages":true,"elements-color-picker":true,"admin-top-bar":true},"urls":{"assets":"https:\/\/brunnasiqueira.com\/wp-content\/plugins\/elementor\/assets\/"},"settings":{"page":[],"editorPreferences":[]},"kit":{"active_breakpoints":["viewport_mobile","viewport_tablet"],"global_image_lightbox":"yes","lightbox_enable_counter":"yes","lightbox_enable_fullscreen":"yes","lightbox_enable_zoom":"yes","lightbox_enable_share":"yes","lightbox_title_src":"title","lightbox_description_src":"description"},"post":{"id":6,"title":"Brunna%20Siqueira%20%E2%80%93%20Descomplica%20Upgrade","excerpt":"","featuredImage":false}};
+var elementorFrontendConfig = {"environmentMode":{"edit":false,"wpPreview":false,"isScriptDebug":false},"i18n":{"shareOnFacebook":"Compartilhar no Facebook","shareOnTwitter":"Compartilhar no Twitter","pinIt":"Fixar","download":"Baixar","downloadImage":"Baixar imagem","fullscreen":"Tela cheia","zoom":"Zoom","share":"Compartilhar","playVideo":"Reproduzir v\u00eddeo","previous":"Anterior","next":"Pr\u00f3ximo","close":"Fechar"},"is_rtl":false,"breakpoints":{"xs":0,"sm":480,"md":768,"lg":1025,"xl":1440,"xxl":1600},"responsive":{"breakpoints":{"mobile":{"label":"Celular","value":767,"default_value":767,"direction":"max","is_enabled":true},"mobile_extra":{"label":"Celular extra","value":880,"default_value":880,"direction":"max","is_enabled":false},"tablet":{"label":"Tablet","value":1024,"default_value":1024,"direction":"max","is_enabled":true},"tablet_extra":{"label":"Tablet extra","value":1200,"default_value":1200,"direction":"max","is_enabled":false},"laptop":{"label":"Laptop","value":1366,"default_value":1366,"direction":"max","is_enabled":false},"widescreen":{"label":"Widescreen","value":2400,"default_value":2400,"direction":"min","is_enabled":false}}},"version":"3.5.3","is_static":false,"experimentalFeatures":{"e_import_export":true,"e_hidden_wordpress_widgets":true,"landing-pages":true,"elements-color-picker":true,"favorite-widgets":true,"admin-top-bar":true},"urls":{"assets":"https:\/\/brunnasiqueira.com\/wp-content\/plugins\/elementor\/assets\/"},"settings":{"page":[],"editorPreferences":[]},"kit":{"active_breakpoints":["viewport_mobile","viewport_tablet"],"global_image_lightbox":"yes","lightbox_enable_counter":"yes","lightbox_enable_fullscreen":"yes","lightbox_enable_zoom":"yes","lightbox_enable_share":"yes","lightbox_title_src":"title","lightbox_description_src":"description"},"post":{"id":6,"title":"Brunna%20Siqueira%20%E2%80%93%20Mapa%20do%20Dinheiro%20Urgente%20","excerpt":"","featuredImage":false}};
 </script>
-<script type='text/javascript' src='https://brunnasiqueira.com/wp-content/plugins/elementor/assets/js/frontend.min.js?ver=3.3.1' id='elementor-frontend-js'></script>
-<script type='text/javascript' src='https://brunnasiqueira.com/wp-content/plugins/elementor/assets/js/preloaded-modules.min.js?ver=3.3.1' id='preloaded-modules-js'></script>
+<script type='text/javascript' src='https://brunnasiqueira.com/wp-content/plugins/elementor/assets/js/frontend.min.js?ver=3.5.3' id='elementor-frontend-js'></script>
+<script type='text/javascript' src='https://brunnasiqueira.com/wp-content/plugins/elementskit-lite/widgets/init/assets/js/animate-circle.js?ver=2.5.1' id='animate-circle-js'></script>
+<script type='text/javascript' src='https://brunnasiqueira.com/wp-content/plugins/elementskit-lite/widgets/init/assets/js/elementor.js?ver=2.5.1' id='elementskit-elementor-js'></script>
+<script type='text/javascript' src='https://brunnasiqueira.com/wp-content/plugins/elementor/assets/js/preloaded-modules.min.js?ver=3.5.3' id='preloaded-modules-js'></script>
 
- 
 <iframe width="1" height="0"
-src="https://go.hotmart.com/Q46622265B?ap=c0f9"></iframe>
+src="https://go.hotmart.com/Q46622265B?ap=8193"></iframe>
+
+
 </body>
 </html>
